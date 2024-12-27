@@ -8,3 +8,6 @@ I discovered great accuracy working with those Phi models.
 This project build on the backend side only so it will be a raw code, and note that for avatar generation, I have implemented openCV and a python library call simpleaudio.
 Do check those out!
 Thanks.
+
+Ways to start!
+Refer to the documentation (step by step for the startup)
