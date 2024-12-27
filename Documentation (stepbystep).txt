@@ -1,0 +1,115 @@
+Project Documentation
+
+
+Step 1
+Install fastrag and other libraries in a virtual environment
+->create virtual environment
+->pip install fastrag==3.1.0
+->pip install farm-haystack[all]
+check version 1.26.3 (initial)
+can work with 1.26.4
+->pip install haystack-ai==2.1.2
+->pip install pypdf2
+->pip install gtts
+
+check haystack downloaded correctly by cmd
+python
+from haystack import document
+
+
+Step 2
+Clone Wav2Lip into the venv
+git clone https://github.com/Rudrabha/Wav2Lip.git
+Download this file from both folder to add into the checkpoints folder
+1. (gan_model path file) https://iiitaphyd-my.sharepoint.com/:u:/g/personal/radrabha_m_research_iiit_ac_in/EdjI7bZlgApMqsVoEUUXpLsBxqXbn5z8VTmoxp55YNDcIA?e=n9ljGW
+2. (wav2lip.pth normal) https://iiitaphyd-my.sharepoint.com/:u:/g/personal/radrabha_m_research_iiit_ac_in/Eb3LEzbfuKlJiR600lQWRxgBIY27JZg80f7V9jtMfbNDaQ?e=TBFBVW
+save those files into the wav2lip->checkpoints folder
+
+
+Step 3
+Download the hugginface-client to download model
+-quantized or compressed
+To download the model, use sign in with huggingface account
+Make sure you have permission to access the model
+->pip install -U "huggingface_hub[cli]"
+Once downloaded, must use access token from your account and enter this line
+->huggingface-cli login 
+Copy your token and paste it 
+then save in credential, type 'y'
+If git problem occurs, use this code
+-> git config --global credential.helper store
+Then, rerun the huggingface 
+
+
+Step 4
+Install more dependancies
+->Install openvino==2014.5.0 
+->Install torch==2.5.1
+->Install opencv-python==4.10.0.84
+->(optimum & genai)
+
+Model("meta-llama/Llama-3.2-1B")
+python in cmd
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+# Download model and tokenizer(no need to include in python when coding in cmd)
+model_name = "meta-llama/Llama-3.2-1B"
+model = AutoModelForCausalLM.from_pretrained(model_name)
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+# Save locally
+model.save_pretrained("path/to/llm_model")
+tokenizer.save_pretrained("path/to/llama-3.2-1B")
+
+Convert Model to OpenVINO Format:
+ 
+Use the Optimum Intel export tool to convert the model to OpenVINO IR format:
+python: model=OVModelForCausalLM.from_pretrained(model_name, export=True)
+
+bash
+Copy code
+optimum-cli export openvino --model from-huggingface-repo-id --task text-generation ov_model
+
+
+Step 5
+Now, you can code the document store. You can use:-
+1. Transformer Similarity Search
+2. Elastic Search
+
+And more, but in this project, only applying the first method.
+The flow of the code must allow the pdf documents into a document store and later can be used in RAG-LLM generation.
+
+Step 6
+Next step is crucial. Setting the prompt template for the model to follow. 
+As prompt act as instructions, it's important to set the right words. 
+You should do some research on it before setting the prompt template.
+
+Step 7
+Next, include a code which will access the compressed model. Other things to include:
+generator(model, compressed model_path, deveice to run the openvino (CPU,GPU0,GPU1) and task)
+
+Moving on to pipeline. Must build the pipeline for ranker, retriever and prompt builder.
+(Refer to the ipynb file)
+
+Then, time to set the query.
+Query from the user and a small pipeline to include the three pipeline above
+Set top_k parameter, the lesser value indicates relevance to the original document. 
+
+
+Step 8
+Evaluation of the model can be done in two methods. 
+Firstly, Cosine Similarity and this is based on generated answer and retrieved text, so it will help to identify if the sentence generated are accurate or not. So far, the model accuracy reached to an all 65% and to make it even better, I suggest using bigger model.
+Currently, the model being used are llama3.2 1B parameter and note that, this model was not trained at all
+I try use the bigger model and the accuracy is worst. 
+Further research should be done.
+
+Second method is definitely the human evaluation. Where we understand the document we are putting into the code and then test the text generation and cross validate with the original document. 
+
+
+Step 9  
+After that, the answer generated will be tested how mnay tokens generated per query and will be splitted into sentences.
+
+With gTTS, we are able to create the audio for each sentences and saved in the folder. Followed by, using Wav2Lip to generate lip-sync video
+(Refer to the ipynb file for more details)
+The flow the system here is, an avatar will be popped out as in livestream and the lip-sync video and audio will be put into the queue. This will stitch the video and audio properly. 
+As using openCV, it only works with video and not the audio, so to combine that, use a python library; in our case, it's the simpleaudio library and this will help to produce a relaistic live stream.  
+
