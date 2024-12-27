@@ -106,10 +106,13 @@ Second method is definitely the human evaluation. Where we understand the docume
 
 
 Step 9  
-After that, the answer generated will be tested how mnay tokens generated per query and will be splitted into sentences.
+After that, the answer generated will be tested how many tokens generated per query and will be splitted into sentences.
 
 With gTTS, we are able to create the audio for each sentences and saved in the folder. Followed by, using Wav2Lip to generate lip-sync video
 (Refer to the ipynb file for more details)
-The flow the system here is, an avatar will be popped out as in livestream and the lip-sync video and audio will be put into the queue. This will stitch the video and audio properly. 
+The flow of the system here is, an avatar will be popped out as in livestream and the lip-sync video and audio will be put into the queue. This will stitch the video and audio properly. 
 As using openCV, it only works with video and not the audio, so to combine that, use a python library; in our case, it's the simpleaudio library and this will help to produce a relaistic live stream.  
+# Use a video of the avatar (idle state) and then any video of the similar avatar, you can just put together the lip sync as in the code and this will stitch the idle video and the lip-sync video.
 
+Further plans:
+create frontend and combine it with backend to create the full system!
